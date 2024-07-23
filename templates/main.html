@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>OBSBOT controller</title>
+  </head>
+  <body class="bg-stone-800 text-white">
+    <div class="container mx-auto">
+      <div class="flex flex-col px-6">
+        <div class="py-4">
+          <div class="bg-red-600 text-white text-center py-4 rounded-sm">
+            OBSBOT controller
+          </div>
+        </div>
+        <div class="flex flex-col py-4 gap-2">
+          <span
+            >speed
+            <input
+              type="range"
+              class="accent-red-500"
+              id="speed"
+              min="0"
+              value="{{ data.speed }}"
+              max="90"
+              oninput="handleInput()"
+              onchange="handleChange()"
+            /><span id="txtSpeed">{{ data.speed }}</span>
+            <button
+              type="button"
+              class="px-2 py-1 bg-red-600 hover:bg-red-400 text-white rounded-md"
+              onclick="setSpeed(1)"
+            >
+              very slow (recommended)
+            </button>
+            <button
+              type="button"
+              class="px-2 py-1 bg-red-600 hover:bg-red-400 text-white rounded-md"
+              onclick="setSpeed(30)"
+            >
+              medium
+            </button>
+            <button
+              type="button"
+              class="px-2 py-1 bg-red-600 hover:bg-red-400 text-white rounded-md"
+              onclick="setSpeed(60)"
+            >
+              fast
+            </button>
+            <button
+              type="button"
+              class="px-2 py-1 bg-red-600 hover:bg-red-400 text-white rounded-md"
+              onclick="setSpeed(90)"
+            >
+              maximum
+            </button>
+          </span>
+          <span>
+            pan
+            <input
+              type="range"
+              class="accent-red-500"
+              id="pan"
+              min="-129"
+              value="{{ data.pan }}"
+              max="129"
+              oninput="handleInput()"
+              onchange="handleChange()"
+            /><span id="txtPan">{{ data.pan }}</span>
+          </span>
+          <span>
+            pitch
+            <input
+              type="range"
+              class="accent-red-500"
+              id="pitch"
+              min="-59"
+              value="{{ data.pitch }}"
+              max="59"
+              oninput="handleInput()"
+              onchange="handleChange()"
+            /><span id="txtPitch">{{ data.pitch }}</span>
+          </span>
+        </div>
+
+        <div class="flex flex-row gap-2">
+          <form method="POST" onsubmit="handleSubmit()">
+            <input
+              type="hidden"
+              class="cam_speed"
+              name="camera_speed"
+              value="0"
+            />
+            <input type="hidden" class="cam_pan" name="camera_pan" value="0" />
+            <input
+              type="hidden"
+              class="cam_pitch"
+              name="camera_pitch"
+              value="0"
+            />
+
+            <input type="hidden" name="command_move" value="move" />
+            <button
+              type="submit"
+              class="px-4 py-2 bg-red-600 hover:bg-red-400 text-white rounded-md"
+            >
+              Move
+            </button>
+          </form>
+          <form method="POST" onsubmit="handleSubmit()">
+            <input
+              type="hidden"
+              class="cam_speed"
+              name="camera_speed"
+              value="0"
+            />
+            <input type="hidden" class="cam_pan" name="camera_pan" value="0" />
+            <input
+              type="hidden"
+              class="cam_pitch"
+              name="camera_pitch"
+              value="0"
+            />
+
+            <input type="hidden" name="command_move" value="left" />
+            <button
+              type="submit"
+              class="px-4 py-2 bg-red-600 hover:bg-red-400 text-white rounded-md"
+            >
+              Move left
+            </button>
+          </form>
+          <form method="POST" onsubmit="handleSubmit()">
+            <input
+              type="hidden"
+              class="cam_speed"
+              name="camera_speed"
+              value="0"
+            />
+            <input type="hidden" class="cam_pan" name="camera_pan" value="0" />
+            <input
+              type="hidden"
+              class="cam_pitch"
+              name="camera_pitch"
+              value="0"
+            />
+
+            <input type="hidden" name="command_move" value="right" />
+            <button
+              type="submit"
+              class="px-4 py-2 bg-red-600 hover:bg-red-400 text-white rounded-md"
+            >
+              Move right
+            </button>
+          </form>
+          <button
+            class="px-4 py-2 bg-red-600 hover:bg-red-400 text-white rounded-md inline-block relative"
+            onclick="handleAutoPan()"
+          >
+            <span>Auto Pan</span>
+            <div
+              class="absolute top-1 right-1 invisible"
+              id="autopan_status_activated"
+            >
+              <span class="relative flex h-3 w-3">
+                <span
+                  class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400"
+                >
+                </span>
+                <span
+                  class="relative inline-flex rounded-full h-3 w-3 bg-green-500"
+                >
+                </span>
+              </span>
+            </div>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      let speed = document.getElementById("speed").value;
+      let pan = document.getElementById("pan").value;
+      let pitch = document.getElementById("pitch").value;
+
+      function handleInput() {
+        speed = document.getElementById("speed").value;
+        pan = document.getElementById("pan").value;
+        pitch = document.getElementById("pitch").value;
+
+        document.getElementById("txtSpeed").textContent = speed;
+        document.getElementById("txtPan").textContent = pan;
+        document.getElementById("txtPitch").textContent = pitch;
+      }
+
+      function setSpeed(val) {
+        document.getElementById("speed").value = val;
+        speed = val;
+        handleChange();
+      }
+
+      function handleSubmit(evt) {
+        evt.preventDefault();
+        console.log("submitted!");
+      }
+
+      function handleChange() {
+        speed = document.getElementById("speed").value;
+        pan = document.getElementById("pan").value;
+        pitch = document.getElementById("pitch").value;
+
+        document.getElementById("txtSpeed").textContent = speed;
+        document.getElementById("txtPan").textContent = pan;
+        document.getElementById("txtPitch").textContent = pitch;
+
+        const all_speed = document.querySelectorAll(".cam_speed");
+        for (let i = 0; i < all_speed.length; i++) {
+          all_speed[i].value = speed;
+        }
+
+        const all_pan = document.querySelectorAll(".cam_pan");
+        for (let i = 0; i < all_pan.length; i++) {
+          all_pan[i].value = pan;
+        }
+
+        const all_pitch = document.querySelectorAll(".cam_pitch");
+        for (let i = 0; i < all_pitch.length; i++) {
+          all_pitch[i].value = pitch;
+        }
+      }
+
+      async function autoPanMove() {
+        let moveLeftFormData = new FormData();
+        moveLeftFormData.append("camera_speed", speed);
+        if (autopan_mode == "left") {
+          moveLeftFormData.append("camera_pan", "129");
+          autopan_mode = "right";
+        } else if (autopan_mode == "right") {
+          moveLeftFormData.append("camera_pan", "-129");
+          autopan_mode = "left";
+        }
+        moveLeftFormData.append("camera_pitch", pitch);
+        moveLeftFormData.append("command_move", "move");
+
+        const respMoveLeft = await fetch("/", {
+          method: "POST",
+          body: moveLeftFormData,
+        });
+      }
+
+      function calculateTimeNeededInMs(speedval) {
+        const distance = 285; // if speed = 1, time needed is roughly 4:45 / 285 seconds
+        return Math.round(distance / Number(speedval)) * 1000;
+      }
+
+      let autopan_mode = "left";
+      let autopan_activated = false;
+      let autopan_timer;
+
+      async function handleAutoPan() {
+        autopan_activated = !autopan_activated;
+
+        if (autopan_activated) {
+          document
+            .getElementById("autopan_status_activated")
+            .classList.remove("invisible");
+
+          let initFormData = new FormData();
+          initFormData.append("camera_speed", "90");
+          initFormData.append("camera_pan", "-129");
+          initFormData.append("camera_pitch", pitch);
+          initFormData.append("command_move", "move");
+
+          const resp = await fetch("/", {
+            method: "POST",
+            body: initFormData,
+          });
+
+          setTimeout(function () {
+            autoPanMove();
+            autopan_timer = setInterval(
+              autoPanMove,
+              calculateTimeNeededInMs(speed)
+            );
+          }, calculateTimeNeededInMs(90));
+        } else {
+          document
+            .getElementById("autopan_status_activated")
+            .classList.add("invisible");
+          clearInterval(autopan_timer);
+        }
+
+        // setInterval(function() {
+
+        // }, 1000);
+      }
+
+      handleChange();
+    </script>
+  </body>
+</html>
